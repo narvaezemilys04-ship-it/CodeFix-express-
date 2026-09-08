@@ -1,17 +1,15 @@
-require("dotenv").config();
-
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req,res)=>{
- res.send("API CodeFix Express");
+app.get("/api", (req, res) => {
+	res.json({
+		message: "API CodeFix Express funcionando",
+	});
 });
 
-app.listen(process.env.PORT,()=>{
- console.log(`Servidor ejecutándose en puerto ${process.env.PORT}`);
-});
+export default app;

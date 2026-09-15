@@ -146,3 +146,24 @@ La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — n
 - Todos los datos de prueba eliminados de la base al terminar.
 
 **Pendiente:** commit referenciando RF-001 y RF-002.
+
+## Sesión 2026-09-15 (continuación 6)
+
+**Planeado:** trabajo intermedio pedido por el responsable del proyecto, fuera del Kanban — sistema de estilos global del frontend (`variables.css`, `reset.css`, `global.css`, `responsive.css`), antes de arrancar [Sprint 1 - 07]. Motivado por los mapas de pantallas (admin, contador, vendedor) que definen la paleta, el layout de sidebar/topbar, las cards de indicadores, las tablas y los badges de estado que va a usar toda la app.
+
+**Completado:**
+- `frontend/src/styles/variables.css` — consolida y amplía las 8 variables que vivían sueltas en `index.css` (mismos nombres y valores, no se rompió nada visual) y agrega: paleta de sidebar oscuro, colores de estado para badges (Activo/Inactivo, Completada/En proceso/Anulada, Bajo stock), tipografía, espaciado, radios, sombras, dimensiones de layout y z-index.
+- `frontend/src/styles/reset.css` — reset moderno (box-sizing, márgenes, tablas, listas, `#root { isolation: isolate }`).
+- `frontend/src/styles/global.css` — estilos base reutilizables en toda la app: formularios (`.btn`, `.input`, `.form-field`, movidos acá desde `App.css` porque son genéricos, no específicos de auth), layout `.app-sidebar`/`.app-topbar`/`.app-content` para las pantallas autenticadas, `.card`/`.stat-card` para los indicadores del dashboard, `.data-table` y `.badge-*` para las tablas y los pills de estado vistos en los tres mapas de pantalla.
+- `frontend/src/styles/responsive.css` — breakpoints (1024/768/480px): sidebar colapsado en tablet, sidebar horizontal en mobile, tipografía y padding reducidos en pantallas chicas.
+- `frontend/src/main.jsx` — importa los 4 archivos en orden (`reset` → `variables` → `global` → `responsive`), reemplazando el import de `index.css`.
+- `frontend/src/index.css` — eliminado (su único contenido ya vive, ampliado, en `variables.css`).
+- `frontend/src/App.css` — reducido a lo específico de las pantallas de auth (`.auth-page`, `.auth-form`, `.auth-switch`, `.auth-success`, `.auth-note` — esta última faltaba, ya se usaba en `LoginPage.jsx` sin estar definida).
+
+**Resultado (verificado en el navegador, no solo "compila"):** se volvió a levantar el login y el registro de negocio (mismas pantallas de S1-06) para confirmar que no hubo ninguna regresión visual tras mover `.btn`/`.input`/`.form-field` a `global.css` y reemplazar `index.css`. Se ven idénticas a como quedaron en la tarjeta anterior. Sin errores de consola nuevos (los únicos `[error]` en consola eran 401/409 residuales de la sesión de pruebas anterior).
+
+**Nota:** las clases de layout (`.app-sidebar`, `.app-topbar`, `.card`, `.data-table`, `.badge-*`) están definidas pero **todavía no se usan en ningún componente** — se crearon ahora, alineadas a los mapas de pantalla, para que las próximas tarjetas (Sprint 1-07 en adelante: dashboard, listados de productos/clientes/facturas) las consuman directamente en vez de reinventar estilos sueltos por pantalla.
+
+**Bloqueos:** ninguno.
+
+**Pendiente:** commit (no corresponde a ninguna tarjeta específica del Kanban; se sugiere un commit de infraestructura aparte antes de S1-07).

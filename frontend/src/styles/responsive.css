@@ -1,0 +1,54 @@
+/*
+ * Breakpoints de referencia del proyecto (documentados acá porque las custom
+ * properties de CSS no se pueden usar dentro de @media):
+ *   sm: 480px | md: 768px | lg: 1024px | xl: 1280px
+ */
+
+@media (max-width: 1024px) {
+	.app-sidebar {
+		width: var(--layout-sidebar-width-collapsed);
+		padding: var(--spacing-lg) var(--spacing-xs);
+	}
+
+	.app-sidebar-item span {
+		display: none;
+	}
+}
+
+@media (max-width: 768px) {
+	.app-layout {
+		flex-direction: column;
+	}
+
+	.app-sidebar {
+		width: 100%;
+		height: auto;
+		flex-direction: row;
+		overflow-x: auto;
+		padding: var(--spacing-sm);
+	}
+
+	.app-content {
+		padding: var(--spacing-md);
+	}
+
+	.auth-form {
+		max-width: 100%;
+		margin: 0 var(--spacing-md);
+	}
+}
+
+@media (max-width: 480px) {
+	:root {
+		--font-size-2xl: 1.5rem;
+		--font-size-xl: 1.25rem;
+	}
+
+	.data-table {
+		font-size: var(--font-size-xs);
+	}
+
+	.card {
+		padding: var(--spacing-md);
+	}
+}

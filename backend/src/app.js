@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import negociosRoutes from "./routes/negocios.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -14,5 +15,6 @@ app.get("/api", (req, res) => {
 });
 
 app.use("/api/negocios", negociosRoutes);
+app.use("/api/auth", authRoutes);
 
 export default app;

@@ -46,3 +46,25 @@ Registro breve por sesión: lo planeado, lo completado y los bloqueos (Plan de T
 - Correo repetido → 409 `CORREO_DUPLICADO`.
 - Datos de prueba eliminados de la base al terminar.
 - Pendiente: commit referenciando RF-001.
+
+## Sesión 2026-09-15 (continuación 2)
+
+**Planeado:** Tarjeta [Sprint 1 - 03] — Backend: login con JWT (RF-002).
+
+**Completado:**
+- `backend/src/utils/jwt.js` — `firmarToken`/`verificarToken` (`JWT_SECRET`, `JWT_EXPIRES_IN` desde `.env`, default 8h).
+- `backend/src/validators/auth.validator.js` — valida `correo`/`contrasena` obligatorios.
+- `backend/src/services/auth.service.js` — `login(correo, contrasena)`: única consulta sin `tenantId` (DDS 5.2.1), compara con bcrypt, firma el JWT con `{ id, rol, tenantId }`. También rechaza usuarios con `activo=false` (adelanto de RF-003, necesario para no dejar un agujero de seguridad).
+- `backend/src/controllers/auth.controller.js` — mapea a 200/400/401.
+- `backend/src/routes/auth.routes.js` — `POST /api/auth/login`, montada en `app.js`.
+
+**Bloqueos:** ninguno — no hubo sorpresas nuevas de Prisma 7 esta vez (reusa el mismo `config/prisma.js`).
+
+**Resultado (probado manualmente contra el servidor real, puerto 3000):**
+- Login con credenciales correctas → 200, token JWT decodificado confirma payload `{ id, rol, tenantId, iat, exp }` exacto (DDS 7.1).
+- Contraseña incorrecta → 401 `CREDENCIALES_INVALIDAS`.
+- Correo inexistente → 401, **mismo mensaje genérico** que contraseña incorrecta (no se filtra si el correo existe).
+- Usuario desactivado (`activo=false`) → 401, mismo mensaje genérico.
+- Body incompleto → 400.
+- Datos de prueba eliminados de la base al terminar.
+- Pendiente: commit referenciando RF-002.

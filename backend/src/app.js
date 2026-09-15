@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import negociosRoutes from "./routes/negocios.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import usuariosRoutes from "./routes/usuarios.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -17,6 +18,7 @@ app.get("/api", (req, res) => {
 
 app.use("/api/negocios", negociosRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 
 // Debe ir al final: captura los errores que `next(err)` propaga desde
 // cualquier ruta o middleware anterior.

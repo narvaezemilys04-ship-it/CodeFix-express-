@@ -94,3 +94,27 @@ La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — n
 **Bloqueos:** ninguno.
 
 **Pendiente:** commit referenciando RF-020.
+
+## Sesión 2026-09-15 (continuación 4)
+
+**Planeado:** Tarjeta [Sprint 1 - 05] — Gestión de usuarios internos y roles (RF-003, RF-004).
+
+**Completado:**
+- `backend/src/validators/usuarios.validator.js` — valida creación (`nombre`, `correo`, `contrasena`, `rol` ∈ {ADMIN,VENDEDOR,CONTADOR}) y actualización (`rol` y/o `activo`).
+- `backend/src/services/usuarios.service.js` — `listarUsuarios`, `crearUsuario`, `actualizarUsuario`; **todo método recibe `tenantId` y lo aplica en el `where`** (DDS 5.3); nunca devuelve `contraseñaHash`.
+- `backend/src/controllers/usuarios.controller.js` — usa `next(error)` + `error.middleware` (patrón centralizado de S1-04; código nuevo ya no repite el `try/catch` manual de las tarjetas anteriores).
+- `backend/src/routes/usuarios.routes.js` — `GET/POST /api/usuarios`, `PATCH /api/usuarios/:id`, con `auth + tenant + role("ADMIN")` aplicado a nivel de router completo.
+
+**Resultado (probado manualmente contra el servidor real, con DOS negocios distintos para verificar aislamiento):**
+- `GET /api/usuarios` sin token → 401.
+- Admin A lista usuarios → 200, solo ve los de su propio negocio.
+- Admin A crea un VENDEDOR → 201.
+- Ese VENDEDOR se loguea con éxito → 200 (confirma el criterio de aceptación de la tarjeta).
+- El VENDEDOR intenta `GET /api/usuarios` → 403 (rol insuficiente, endpoint real, no el de diagnóstico ya borrado).
+- Admin A desactiva al VENDEDOR (`PATCH activo:false`) → 200; el VENDEDOR ya no puede loguearse → 401.
+- **Aislamiento multi-tenant** (lo más crítico, DDS 5.3 + Plan de Trabajo sección 6): Admin B lista usuarios → 200, ve únicamente a Admin B, nada del Negocio A. Admin B intenta `PATCH /api/usuarios/6` (id real de un usuario del Negocio A, adivinado) → **404 "Usuario no encontrado"**, no 403 — no delata ni siquiera que el recurso existe en otro tenant.
+- Todos los datos de prueba (2 negocios, 3 usuarios) eliminados de la base al terminar.
+
+**Bloqueos:** ninguno.
+
+**Pendiente:** commit referenciando RF-003 y RF-004.

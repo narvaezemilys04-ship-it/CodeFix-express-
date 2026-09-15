@@ -42,3 +42,86 @@ model Usuario {
 
   @@index([tenantId])
 }
+
+/// =============================
+/// ENUMS
+/// =============================
+
+enum TipoMovimiento {
+  ENTRADA
+  SALIDA
+  AJUSTE
+}
+
+/// =============================
+/// CATEGORÍAS DE PRODUCTOS
+/// =============================
+
+model CategoriaProducto {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @db.VarChar(100)
+  descripcion String?    @db.VarChar(255)
+  activa      Boolean    @default(true)
+
+  productos   Producto[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("categorias_productos")
+}
+
+/// =============================
+/// PRODUCTOS
+/// =============================
+
+model Producto {
+  id              Int                  @id @default(autoincrement())
+  nombre          String               @db.VarChar(150)
+  descripcion     String?              @db.Text
+  codigo          String               @unique @db.VarChar(50)
+  precio          Decimal              @db.Decimal(10, 2)
+  stock           Int                  @default(0)
+  stockMinimo     Int                  @default(5)
+  activo          Boolean              @default(true)
+
+  categoriaId     Int
+  categoria       CategoriaProducto    @relation(fields: [categoriaId], references: [id])
+
+  movimientos     MovimientoInventario[]
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([categoriaId])
+  @@map("productos")
+}
+
+/// =============================
+/// MOVIMIENTOS DE INVENTARIO
+/// =============================
+
+model MovimientoInventario {
+  id              Int              @id @default(autoincrement())
+
+  productoId      Int
+  producto        Producto         @relation(fields: [productoId], references: [id])
+
+  tipo            TipoMovimiento
+
+  cantidad        Int
+  stockAnterior   Int
+  stockNuevo      Int
+
+  motivo          String?          @db.VarChar(255)
+  observaciones   String?          @db.Text
+
+  fechaMovimiento DateTime         @default(now())
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([productoId])
+  @@index([fechaMovimiento])
+  @@map("movimientos_inventario")
+}

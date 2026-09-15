@@ -68,3 +68,29 @@ Registro breve por sesión: lo planeado, lo completado y los bloqueos (Plan de T
 - Body incompleto → 400.
 - Datos de prueba eliminados de la base al terminar.
 - Pendiente: commit referenciando RF-002.
+
+## Sesión 2026-09-15 (continuación 3)
+
+**Planeado:** Tarjeta [Sprint 1 - 04] — Middleware de autenticación, tenant y roles (RF-020).
+
+**Completado:**
+- `backend/src/utils/errors.js` — clase base `AppError` + subclases (`ValidationError` 400, `UnauthorizedError` 401, `ForbiddenError` 403, `NotFoundError` 404, `ConflictError` 409), formato de respuesta `{ error: { codigo, mensaje } }` (DDS 4.1).
+- `backend/src/middlewares/auth.middleware.js` — verifica `Authorization: Bearer <token>`, adjunta `req.user = { id, rol, tenantId }`.
+- `backend/src/middlewares/tenant.middleware.js` — adjunta `req.tenantId` desde `req.user.tenantId`.
+- `backend/src/middlewares/role.middleware.js` — `role(...rolesPermitidos)`, factory de middleware.
+- `backend/src/middlewares/error.middleware.js` — montado al final de `app.js`, traduce `AppError` a la respuesta HTTP correspondiente.
+
+**Cómo se probó (sin rutas protegidas reales todavía — esta tarjeta es prerrequisito de S1-05):**
+Se creó una ruta temporal `_diagnostico.routes.js` con `auth + tenant + role("ADMIN")` encadenados, se generaron tokens de prueba (`ADMIN`, `VENDEDOR`) firmados con la misma utilidad JWT, y se probó contra el servidor real:
+- Sin token → 401 `NO_AUTENTICADO`.
+- Header sin prefijo `Bearer` → 401 (tratado igual que "sin token").
+- Token corrupto/inválido → 401, mensaje distinto ("inválido o expirado").
+- Token válido pero rol `VENDEDOR` contra ruta que exige `ADMIN` → 403 `NO_AUTORIZADO`.
+- Token válido y rol `ADMIN` → 200, con `req.user` y `req.tenantId` correctamente propagados.
+La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — no quedan en el código final.
+
+**Observación arquitectónica (no bloqueante, a decidir):** `negocios.controller.js` y `auth.controller.js` (Sprint 1-02 y 1-03) manejan sus propios `try/catch` con `res.status()` directo, en vez de `next(err)` + `AppError` + este `error.middleware` centralizado. Ambos ya producen el mismo formato de respuesta `{ error: { codigo, mensaje } }`, así que no hay inconsistencia de contrato — pero sí dos mecanismos distintos conviviendo en el mismo backend. Se puede homogeneizar en una tarea aparte si se considera necesario; no se tocó en esta tarjeta para no exceder su alcance.
+
+**Bloqueos:** ninguno.
+
+**Pendiente:** commit referenciando RF-020.

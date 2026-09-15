@@ -1,0 +1,30 @@
+.card {
+	background-color: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	padding: var(--spacing-lg);
+}
+
+.stat-card {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+}
+
+.stat-card-value {
+	font-size: var(--font-size-2xl);
+	font-weight: var(--font-weight-bold);
+	color: var(--color-dark);
+}
+
+.stat-card-label {
+	font-size: var(--font-size-sm);
+	color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+	.card {
+		padding: var(--spacing-md);
+	}
+}

@@ -197,3 +197,29 @@ La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — n
 - Todos los datos de prueba (1 negocio, 2 usuarios) eliminados de la base al terminar.
 
 **Pendiente:** commit referenciando RF-019 y RF-020.
+
+## Sesión 2026-09-15 (continuación 8)
+
+**Planeado:** trabajo intermedio pedido por el responsable del proyecto, fuera del Kanban — CSS co-localizado por componente (cada `.jsx` con su propio `.css`), en vez de depender de `global.css`/`App.css` compartidos.
+
+**Decisiones consultadas antes de tocar código** (dos preguntas con trade-offs reales, no asumidas):
+1. `LoginPage` y `RegisterBusinessPage` comparten exactamente el mismo diseño → se optó por un `Auth.css` compartido en vez de duplicar ~40 líneas idénticas en dos archivos.
+2. `.card`/`.data-table`/`.badge-*` (sin consumidor propio todavía) → se optó por crear los componentes reales `Card`/`Table`/`Badge` ahora, cada uno con su CSS, en vez de dejarlos como clases sueltas a la espera de Sprint 2.
+
+**Completado:**
+- `components/Button/Button.css`, `components/Input/Input.css` — migrados desde `global.css` (mismas reglas, solo reubicadas).
+- `components/Card/Card.jsx` (nuevo) + `Card.css` — exporta `Card` (contenedor genérico) y `StatCard` (variante con label/value/helper, para los indicadores del dashboard).
+- `components/Table/Table.jsx` (nuevo) + `Table.css` — envuelve `<thead>/<tbody>` como children (las columnas cambian por módulo); todavía sin consumidor, listo para Sprint 2.
+- `components/Badge/Badge.jsx` (nuevo) + `Badge.css` — `variant`: success/warning/danger/neutral, mapeado a los estados de los mapas de pantalla (Activo, Completada, Anulada, etc.); todavía sin consumidor.
+- `layouts/DashboardLayout.css` — migrado desde `global.css`, incluyendo sus dos media queries (antes en `responsive.css`).
+- `pages/auth/Auth.css` — compartido por `LoginPage` y `RegisterBusinessPage`.
+- `DashboardPage.jsx` y `UsersPage.jsx` actualizados para consumir `StatCard`/`Card` en vez de `className` sueltas.
+- `global.css` reducido a lo verdaderamente transversal (`body`, `h1-h4`, `a`) + una utility nueva `.text-muted`.
+- `responsive.css` reducido a la única regla que sigue siendo genuinamente global (el ajuste de `--font-size-2xl`/`--font-size-xl` en mobile).
+- `App.css` eliminado (quedó vacío tras mover todo su contenido a `Auth.css`) y su import sacado de `App.jsx`.
+
+**Hallazgo corregido en el camino:** `UsersPage.jsx` usaba `className="auth-note"`, una clase que iba a migrar a `Auth.css` — eso habría creado un acoplamiento frágil entre una página de usuarios y el CSS de las páginas de auth (funcionaría por casualidad solo si el usuario ya había visitado `/login` antes en esa sesión de navegación). Se verificó que ninguna página de auth usa ya esa clase (el mensaje que la usaba se sacó en S1-07) y se renombró a `.text-muted` en `global.css`, genuinamente reutilizable.
+
+**Resultado (verificado en el navegador, no solo "compila"):** se volvió a levantar login, registro, dashboard y `/usuarios` con un negocio de prueba nuevo. Cruce manual de cada `className` usada en el código contra las clases definidas en los `.css` correspondientes: cero clases huérfanas. Capturas de pantalla idénticas a como se veían antes de esta reorganización — el cambio es puramente de organización de archivos, no hay ninguna diferencia visual. Sin errores nuevos de consola.
+
+**Pendiente:** commit (no corresponde a ninguna tarjeta específica del Kanban).

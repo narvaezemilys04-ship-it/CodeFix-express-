@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import Button from "../components/Button/Button.jsx";
+import "./DashboardLayout.css";
 
 function itemClase({ isActive }) {
 	return `app-sidebar-item${isActive ? " is-active" : ""}`;

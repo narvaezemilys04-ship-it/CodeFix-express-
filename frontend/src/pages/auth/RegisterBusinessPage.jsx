@@ -4,6 +4,7 @@ import Button from "../../components/Button/Button.jsx";
 import Input from "../../components/Input/Input.jsx";
 import { registrarNegocio } from "../../services/auth.service.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import "./Auth.css";
 
 const CAMPOS_INICIALES = {
 	nombre: "",

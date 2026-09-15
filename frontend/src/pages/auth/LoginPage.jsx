@@ -4,6 +4,7 @@ import Button from "../../components/Button/Button.jsx";
 import Input from "../../components/Input/Input.jsx";
 import { login } from "../../services/auth.service.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import "./Auth.css";
 
 export default function LoginPage() {
 	const { estaAutenticado, login: iniciarSesionEnContexto } = useAuth();

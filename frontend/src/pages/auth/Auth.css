@@ -1,0 +1,51 @@
+/* Compartido entre LoginPage y RegisterBusinessPage: ambas usan exactamente
+   el mismo diseño de formulario público. */
+
+.auth-page {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-background);
+}
+
+.auth-form {
+	width: 100%;
+	max-width: 380px;
+	background: var(--color-white);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	padding: var(--spacing-xl);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
+}
+
+.auth-form h1 {
+	font-size: var(--font-size-xl);
+	color: var(--color-dark);
+	margin: 0 0 var(--spacing-sm);
+}
+
+.auth-switch {
+	font-size: var(--font-size-sm);
+	text-align: center;
+	color: var(--color-text-secondary);
+}
+
+.auth-success {
+	text-align: center;
+}
+
+.form-error {
+	color: var(--color-danger);
+	font-size: var(--font-size-sm);
+	margin: 0;
+}
+
+@media (max-width: 768px) {
+	.auth-form {
+		max-width: 100%;
+		margin: 0 var(--spacing-md);
+	}
+}

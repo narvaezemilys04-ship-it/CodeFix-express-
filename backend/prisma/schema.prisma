@@ -12,7 +12,33 @@ datasource db {
   provider = "mysql"
 }
 
-model PruebaConexion {
-  id     Int    @id @default(autoincrement())
-  nombre String
+enum Rol {
+  ADMIN
+  VENDEDOR
+  CONTADOR
+}
+
+model Negocio {
+  id               Int      @id @default(autoincrement())
+  nombre           String   @db.VarChar(150)
+  nit              String   @unique @db.VarChar(30)
+  tarifaIvaDefault Decimal  @default(19.00) @db.Decimal(5, 2)
+  creadoEn         DateTime @default(now())
+
+  usuarios Usuario[]
+}
+
+model Usuario {
+  id             Int      @id @default(autoincrement())
+  tenantId       Int
+  nombre         String   @db.VarChar(120)
+  correo         String   @unique @db.VarChar(150)
+  contraseñaHash String   @db.VarChar(255)
+  rol            Rol
+  activo         Boolean  @default(true)
+  creadoEn       DateTime @default(now())
+
+  negocio Negocio @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }

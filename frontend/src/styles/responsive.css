@@ -1,0 +1,16 @@
+/*
+ * Breakpoints de referencia del proyecto (documentados acá porque las custom
+ * properties de CSS no se pueden usar dentro de @media):
+ *   sm: 480px | md: 768px | lg: 1024px | xl: 1280px
+ *
+ * Los breakpoints específicos de cada componente (sidebar, tablas, cards,
+ * formulario de auth) viven co-localizados en el CSS de ese componente.
+ * Acá solo queda lo que es genuinamente transversal a toda la app.
+ */
+
+@media (max-width: 480px) {
+	:root {
+		--font-size-2xl: 1.5rem;
+		--font-size-xl: 1.25rem;
+	}
+}

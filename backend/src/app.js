@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import negociosRoutes from "./routes/negocios.routes.js";
 
 const app = express();
 
@@ -11,5 +12,7 @@ app.get("/api", (req, res) => {
 		message: "API CodeFix Express funcionando",
 	});
 });
+
+app.use("/api/negocios", negociosRoutes);
 
 export default app;

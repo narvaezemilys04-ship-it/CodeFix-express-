@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../../components/Button.jsx";
-import Input from "../../components/Input.jsx";
+import { Link, Navigate } from "react-router-dom";
+import Button from "../../components/Button/Button.jsx";
+import Input from "../../components/Input/Input.jsx";
 import { registrarNegocio } from "../../services/auth.service.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const CAMPOS_INICIALES = {
 	nombre: "",
@@ -13,13 +14,15 @@ const CAMPOS_INICIALES = {
 };
 
 export default function RegisterBusinessPage() {
+	const { estaAutenticado } = useAuth();
 	const [form, setForm] = useState(CAMPOS_INICIALES);
 	const [error, setError] = useState("");
 	const [cargando, setCargando] = useState(false);
 	const [registroExitoso, setRegistroExitoso] = useState(false);
 
 	function actualizarCampo(campo) {
-		return (evento) => setForm((prev) => ({ ...prev, [campo]: evento.target.value }));
+		return (evento) =>
+			setForm((prev) => ({ ...prev, [campo]: evento.target.value }));
 	}
 
 	async function manejarEnvio(evento) {
@@ -37,11 +40,17 @@ export default function RegisterBusinessPage() {
 			await registrarNegocio(form);
 			setRegistroExitoso(true);
 		} catch (err) {
-			const mensaje = err.response?.data?.error?.mensaje ?? "No se pudo registrar el negocio.";
+			const mensaje =
+				err.response?.data?.error?.mensaje ??
+				"No se pudo registrar el negocio.";
 			setError(mensaje);
 		} finally {
 			setCargando(false);
 		}
+	}
+
+	if (estaAutenticado) {
+		return <Navigate to="/dashboard" replace />;
 	}
 
 	if (registroExitoso) {
@@ -49,7 +58,10 @@ export default function RegisterBusinessPage() {
 			<div className="auth-page">
 				<div className="auth-form auth-success">
 					<h1>¡Negocio registrado!</h1>
-					<p>Ya podés iniciar sesión con el correo y la contraseña del administrador.</p>
+					<p>
+						Ya podés iniciar sesión con el correo y la contraseña del
+						administrador.
+					</p>
 					<Link to="/login">Ir a iniciar sesión</Link>
 				</div>
 			</div>
@@ -61,8 +73,18 @@ export default function RegisterBusinessPage() {
 			<form className="auth-form" onSubmit={manejarEnvio}>
 				<h1>Registrar negocio</h1>
 
-				<Input id="nombre" label="Nombre del negocio" value={form.nombre} onChange={actualizarCampo("nombre")} />
-				<Input id="nit" label="NIT" value={form.nit} onChange={actualizarCampo("nit")} />
+				<Input
+					id="nombre"
+					label="Nombre del negocio"
+					value={form.nombre}
+					onChange={actualizarCampo("nombre")}
+				/>
+				<Input
+					id="nit"
+					label="NIT"
+					value={form.nit}
+					onChange={actualizarCampo("nit")}
+				/>
 				<Input
 					id="adminNombre"
 					label="Nombre del administrador"

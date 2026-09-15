@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../../components/Button.jsx";
-import Input from "../../components/Input.jsx";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import Button from "../../components/Button/Button.jsx";
+import Input from "../../components/Input/Input.jsx";
 import { login } from "../../services/auth.service.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function LoginPage() {
+	const { estaAutenticado, login: iniciarSesionEnContexto } = useAuth();
+	const navigate = useNavigate();
 	const [correo, setCorreo] = useState("");
 	const [contrasena, setContrasena] = useState("");
 	const [error, setError] = useState("");
 	const [cargando, setCargando] = useState(false);
-	const [sesion, setSesion] = useState(null);
 
 	async function manejarEnvio(evento) {
 		evento.preventDefault();
@@ -23,28 +25,19 @@ export default function LoginPage() {
 		setCargando(true);
 		try {
 			const data = await login({ correo, contrasena });
-			setSesion(data);
+			iniciarSesionEnContexto(data);
+			navigate("/dashboard", { replace: true });
 		} catch (err) {
-			const mensaje = err.response?.data?.error?.mensaje ?? "No se pudo iniciar sesión.";
+			const mensaje =
+				err.response?.data?.error?.mensaje ?? "No se pudo iniciar sesión.";
 			setError(mensaje);
 		} finally {
 			setCargando(false);
 		}
 	}
 
-	if (sesion) {
-		return (
-			<div className="auth-page">
-				<div className="auth-form auth-success">
-					<h1>¡Bienvenido, {sesion.usuario.nombre}!</h1>
-					<p>Sesión iniciada correctamente como {sesion.usuario.rol}.</p>
-					<p className="auth-note">
-						(La redirección al panel y la persistencia de sesión se conectan en la próxima tarjeta,
-						con el contexto de autenticación.)
-					</p>
-				</div>
-			</div>
-		);
+	if (estaAutenticado) {
+		return <Navigate to="/dashboard" replace />;
 	}
 
 	return (
@@ -76,7 +69,8 @@ export default function LoginPage() {
 				</Button>
 
 				<p className="auth-switch">
-					¿No tenés una cuenta? <Link to="/registro-negocio">Registrá tu negocio</Link>
+					¿No tenés una cuenta?{" "}
+					<Link to="/registro-negocio">Registrá tu negocio</Link>
 				</p>
 			</form>
 		</div>

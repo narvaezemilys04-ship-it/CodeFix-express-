@@ -167,3 +167,33 @@ La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — n
 **Bloqueos:** ninguno.
 
 **Pendiente:** commit (no corresponde a ninguna tarjeta específica del Kanban; se sugiere un commit de infraestructura aparte antes de S1-07).
+
+## Sesión 2026-09-15 (continuación 7)
+
+**Planeado:** Tarjeta [Sprint 1 - 07] — Frontend: contexto de sesión, logout y rutas protegidas (RF-019, RF-020).
+
+**Completado:**
+- `frontend/src/context/authStorage.js` — puente en memoria entre el interceptor de Axios (fuera de React) y `AuthContext`; expone `getToken`/`setToken`/`clear`/`onClear`. Nunca usa `localStorage` (DDS 7.1).
+- `frontend/src/context/AuthContext.jsx` — Context API + `useReducer` (tal como pide el DDS 6.2); expone `usuario`, `token`, `estaAutenticado`, `login()`, `logout()`. Se suscribe a `onClear` para reaccionar si la sesión se limpia desde fuera (un 401).
+- `frontend/src/services/api.js` — interceptor de request agrega `Authorization: Bearer <token>`; interceptor de response llama a `clear()` en cualquier 401.
+- `frontend/src/components/ProtectedRoute.jsx` — redirige a `/login` si no hay sesión; si recibe `rolesPermitidos` y el rol no está en la lista, redirige a `/dashboard`.
+- `frontend/src/routes/index.jsx` — router completo: `/login` y `/registro-negocio` públicas; `/dashboard` protegida (cualquier rol); `/usuarios` protegida solo para `ADMIN`; catch-all que decide `/dashboard` o `/login` según haya sesión.
+- `frontend/src/layouts/DashboardLayout.jsx` — sidebar + topbar usando las clases de `global.css` de la sesión anterior; el ítem "Usuarios" del sidebar solo se muestra si `usuario.rol === "ADMIN"`; botón real de "Cerrar sesión".
+- `frontend/src/pages/dashboard/DashboardPage.jsx` — contenido real mínimo (nombre y rol del usuario logueado).
+- `frontend/src/pages/usuarios/UsersPage.jsx` — placeholder protegido (el CRUD visual de usuarios no tiene tarjeta propia todavía en el Kanban; se deja explícito en el propio texto de la página).
+- `LoginPage.jsx` y `RegisterBusinessPage.jsx` — conectados al `AuthContext` real: login exitoso ahora navega de verdad a `/dashboard` (ya no muestra el mensaje "esto se conecta en la próxima tarjeta"); ambas páginas redirigen a `/dashboard` si ya hay sesión activa.
+- `App.jsx` — envuelve el router con `AuthProvider`.
+
+**Bug real encontrado y corregido (no una falsa alarma esta vez):** en `styles/responsive.css`, la regla de tablet (`max-width: 1024px`, esconde el texto del sidebar) y la regla de mobile (`max-width: 768px`, convierte el sidebar en barra horizontal) se superponían en cualquier viewport menor a 768px — el sidebar quedaba horizontal PERO con el texto oculto, mostrando solo una "pill" de color vacía sin ninguna etiqueta legible. Se acotó la regla de tablet a `(max-width: 1024px) and (min-width: 769px)` para que no choque con la de mobile. Encontrado probando de verdad en el navegador en distintos anchos, no revisando el CSS en abstracto.
+
+**Resultado (probado de punta a punta en el navegador, contra el backend real, con un ADMIN y un VENDEDOR reales):**
+- `/dashboard` sin sesión → redirige a `/login`.
+- Login como ADMIN → navega automáticamente a `/dashboard`, sidebar muestra "Inicio" y "Usuarios".
+- ADMIN entra a `/usuarios` → carga el placeholder.
+- Cerrar sesión → vuelve a `/login`; confirmado con `window.location.pathname` que la URL realmente cambió (no solo el contenido).
+- Login como VENDEDOR → sidebar NO muestra "Usuarios".
+- VENDEDOR fuerza la navegación directa a `/usuarios` (sin usar el link) → `ProtectedRoute` lo redirige a `/dashboard` igual — confirma que la protección es real, no solo ocultar el botón.
+- **Simulación de 401**: se forzó un token corrupto en `authStorage` y se disparó una petición real a `/api/usuarios` desde la consola del navegador contra el `api.js` real de la app. El backend respondió 401, el interceptor limpió el token (`getToken()` volvió a dar `null`), y `window.location.pathname` confirmó la redirección real a `/login` — sin recargar la página, solo por el cambio de estado de React propagado por `onClear`.
+- Todos los datos de prueba (1 negocio, 2 usuarios) eliminados de la base al terminar.
+
+**Pendiente:** commit referenciando RF-019 y RF-020.

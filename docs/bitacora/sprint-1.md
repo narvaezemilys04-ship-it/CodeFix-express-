@@ -118,3 +118,31 @@ La ruta de diagnóstico y su montaje en `app.js` se eliminaron al terminar — n
 **Bloqueos:** ninguno.
 
 **Pendiente:** commit referenciando RF-003 y RF-004.
+
+## Sesión 2026-09-15 (continuación 5)
+
+**Planeado:** Tarjeta [Sprint 1 - 06] — Frontend: registro de negocio y login (RF-001, RF-002).
+
+**Completado:**
+- `frontend/src/components/Button.jsx`, `Input.jsx` — componentes reutilizables mínimos (la carpeta `components/` estaba vacía, sin convención previa; se optó por archivos planos, sin subcarpeta por componente).
+- `frontend/src/services/auth.service.js` — `registrarNegocio()`, `login()`, sobre el `api.js`/httpClient ya existente.
+- `frontend/src/pages/auth/LoginPage.jsx` y `RegisterBusinessPage.jsx` (nombres ya definidos por el andamiaje del proyecto, en inglés — se respetaron tal cual, no se renombraron a los nombres en español de la tarjeta original).
+- `frontend/src/App.jsx` — router mínimo (`BrowserRouter` con `/login` y `/registro-negocio`, catch-all a `/login`). El router completo con `AuthContext` y rutas protegidas es la próxima tarjeta (S1-07); acá solo lo necesario para poder probar de verdad estas dos pantallas.
+- `frontend/src/App.css` — estilos base usando las variables de `index.css` (`--color-primary`, `--color-background`, etc.), sin inventar una paleta nueva.
+- Tras un login/registro exitoso, la página muestra un mensaje de confirmación en vez de redirigir a `/dashboard` (esa ruta no existe todavía) — la conexión real con `AuthContext` y la navegación post-login se hacen en S1-07, tal como estaba previsto en la tarjeta original.
+
+**Bloqueos:**
+- `frontend/node_modules` tampoco estaba instalado — se corrió `npm install` antes de levantar Vite.
+- Sin `.claude/launch.json` en la raíz de la sesión (`CodeFix Express/`, no dentro del repo `codefix-express/`) no se puede usar `preview_start`; se creó ese archivo para levantar `npm run dev --prefix codefix-express/frontend`. Vive fuera del repo git, no requiere commit.
+- Falsa alarma visual: en una captura de pantalla el formulario parecía cortado/pegado al borde derecho. Se verificó con `getBoundingClientRect()` y `elementFromPoint()` que el centrado CSS es correcto — era solo el bajísimo contraste entre el blanco de la tarjeta y el gris casi blanco de fondo (`--color-background: #f5f7fa`), agravado por el reescalado de la captura (`devicePixelRatio: 1.25`). No se tocó el CSS.
+
+**Resultado (probado de punta a punta en el navegador real, contra el backend real, no solo revisión de código):**
+- Registro de negocio vía formulario → pantalla de éxito → link a login.
+- Login con las credenciales recién registradas → pantalla de bienvenida con nombre y rol reales devueltos por el backend.
+- Contraseña incorrecta → mensaje de error del backend visible en la UI ("Correo o contraseña incorrectos.").
+- Envío con campos vacíos → validación del lado del cliente, sin llegar a pegarle a la API (RNF-006).
+- NIT duplicado → mensaje de error del backend visible en la UI ("Ya existe un negocio registrado con ese NIT.").
+- Consola del navegador revisada: sin warnings de React ni excepciones sin capturar (el único `[error]` es el log automático del navegador para el 401 de la prueba de credenciales inválidas, ya manejado por el `catch`).
+- Todos los datos de prueba eliminados de la base al terminar.
+
+**Pendiente:** commit referenciando RF-001 y RF-002.

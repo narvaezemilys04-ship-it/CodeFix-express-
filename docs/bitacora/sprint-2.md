@@ -43,3 +43,54 @@ Registro breve por sesión: lo planeado, lo completado y los bloqueos (Plan de T
 - Datos de prueba eliminados de la base al terminar.
 
 **Pendiente:** commit referenciando RF-006 (además del commit pendiente de la corrección del schema).
+
+## Sesión 2026-09-26 (continuación 2) — Backend completo: productos, inventario, alertas de stock
+
+Implementadas de corrido a pedido del responsable del proyecto: `[Sprint 2-03][01]`, `[02]`, `[Sprint 2-04][01]`, `[02]`, `[Sprint 2-05][01]`.
+
+**Completado:**
+- `backend/src/validators/productos.validator.js`, `backend/src/services/productos.service.js` — `listar`, `crear`, `actualizar`, y `listarAlertasStock` (incluida de una vez en el mismo archivo, ya que la tarjeta `[Sprint 2-05]` solo agrega una ruta sobre este mismo service).
+- `backend/src/controllers/productos.controller.js`, `backend/src/routes/productos.routes.js` — `GET/POST /api/productos`, `PATCH /api/productos/:id`, `GET /api/productos/alertas-stock` (montada antes de cualquier ruta con `:id`).
+- `backend/src/validators/inventario.validator.js`, `backend/src/services/inventario.service.js` — `registrarMovimiento` (transacción atómica: crea el movimiento y actualiza `Producto.stock` en la misma operación) y `listarMovimientos`.
+- `backend/src/controllers/inventario.controller.js`, `backend/src/routes/inventario.routes.js` — `POST/GET /api/inventario/movimientos`.
+- `backend/src/app.js` — montadas las tres rutas nuevas.
+
+**Decisiones de diseño tomadas (no estaban 100% especificadas):**
+- `tipo=AJUSTE`: `cantidad` se interpreta como el **valor absoluto nuevo** de stock (reconciliación tras un conteo físico), no como un delta con signo — el schema no tiene un campo de signo, esta es la interpretación más simple y estándar de un ajuste de inventario.
+- Reutilicé la clase genérica `ConflictError` (ya existente desde Sprint 1) con código `"STOCK_INSUFICIENTE"` en vez de crear una clase `StockInsuficienteError` nueva como sugería la tarjeta de Notion original — ya cumple exactamente esa función (409 + código configurable), crear una clase aparte habría sido redundante.
+- Agregada una restricción que no estaba en el validator pero sí en el DDS clásico: un VENDEDOR solo puede registrar movimientos `tipo=SALIDA`; `ENTRADA`/`AJUSTE` quedan exclusivos de ADMIN. Implementada en el controller (el middleware `role()` no distingue por contenido del body).
+
+**Resultado (probado contra el servidor real, con el negocio `tenantId=17` creado para esta sesión):**
+- Productos: 401 sin token, 201 al crear, 403 si VENDEDOR intenta crear, 200 al actualizar precio.
+- Alertas de stock: devuelve correctamente los productos con `stock < stockMinimo`.
+- Inventario: ENTRADA y SALIDA actualizan `Producto.stock` correctamente en la misma transacción; una SALIDA mayor al stock disponible se rechaza (409 `STOCK_INSUFICIENTE`); VENDEDOR bloqueado en ENTRADA (403) pero permitido en SALIDA (201); VENDEDOR bloqueado en `GET /movimientos` (solo ADMIN/CONTADOR).
+
+**Pendiente:** commit referenciando RF-005, RF-007, RF-008.
+
+## Sesión 2026-09-26 (continuación 3) — Frontend completo: productos, inventario, alertas de stock
+
+Implementadas de corrido: `[Sprint 2-06][01]` a `[04]`, `[Sprint 2-07][01]` a `[03]`.
+
+**Completado:**
+- `frontend/src/services/products.service.js`, `frontend/src/hooks/useProducts.js` — CRUD de productos y categorías, estado local sin store global (DDS 6.2).
+- `frontend/src/components/Modal/Modal.jsx` (+ `.css`) — componente genérico controlado (`open`/`onClose`), sin acoplar a ningún dominio.
+- `frontend/src/components/Select/Select.jsx` (+ `.css`) — mismo patrón que `Input`.
+- `frontend/src/pages/productos/ProductsPage.jsx` (+ `.css`) — tabla con `Table`/`Badge` (Sprint 1), modal de creación/edición con `Modal`/`Select`/`Button`/`Input`, botón de activar/desactivar (baja lógica).
+- `frontend/src/services/inventory.service.js`, `frontend/src/hooks/useInventory.js` — historial y registro de movimientos, alertas de stock.
+- `frontend/src/pages/inventario/InventoryPage.jsx` (+ `.css`) — reusa `Modal` (no lo duplica); tipo de movimiento restringido a "Salida" en la UI cuando el rol es VENDEDOR (refleja la regla del backend).
+- `frontend/src/pages/dashboard/AlertasStockWidget.jsx` (+ `.css`) — integrado en `DashboardPage`, visible solo para ADMIN (mismo permiso que el endpoint).
+- Rutas `/productos` (cualquier rol) e `/inventario` (ADMIN y VENDEDOR) agregadas a `AppRoutes.jsx`; links correspondientes en el sidebar de `DashboardLayout.jsx`.
+
+**Corrección arquitectónica en el camino:** `.form-field`/`.form-field-error` vivían solo en `Input.css`. Si `Select` las necesitaba (mismo contenedor de campo) sin que `Input` estuviera cargado en la misma página, hubieran quedado sin estilo — un acoplamiento implícito entre dos componentes que se supone son independientes. Se movieron a `global.css` como utility genuinamente compartida.
+
+**Dos bugs reales encontrados probando en el navegador (no a simple vista):**
+1. Un `<select>` controlado sin ninguna `<option>` que matchee el `value` (`""` inicial) muestra visualmente la primera opción del navegador como "seleccionada", pero el estado de React sigue vacío — al enviar el formulario sin tocar el select, el backend rechazaba con "La categoría es obligatoria" pese a que la UI mostraba una categoría elegida. Corregido preseleccionando la primera opción disponible al abrir el modal, tanto en `ProductsPage` (categoría) como en `InventoryPage` (producto y tipo).
+2. `useInventory` cargaba el historial automáticamente al montar sin importar el rol — para VENDEDOR eso disparaba un `GET /movimientos` que el backend rechaza con 403 (VENDEDOR solo puede registrar, no listar). Se agregó el parámetro `cargarAlInicio` al hook para omitir esa llamada cuando el rol no tiene permiso.
+
+**Resultado (probado en el navegador real, con ADMIN y VENDEDOR, contra el backend real):**
+- Productos: tabla, creación, edición, activar/desactivar — todo con refresco automático tras cada mutación; VENDEDOR ve la lista sin controles de edición.
+- Inventario: historial visible para ADMIN; VENDEDOR ve un mensaje explicativo en vez de un error, y su modal solo ofrece "Salida" como tipo; `ENTRADA`, `SALIDA` y `AJUSTE` probados end-to-end (el ajuste fija el stock al valor indicado, no lo suma).
+- Widget de alertas: muestra correctamente los productos con stock bajo el mínimo, con badge de advertencia; oculto para roles sin permiso.
+- Todos los datos de prueba (1 negocio, 2 usuarios, 3 productos, 1 categoría, 6 movimientos) eliminados de la base al terminar.
+
+**Pendiente:** commit referenciando RF-005, RF-006, RF-007, RF-008 (frontend).

@@ -6,6 +6,8 @@ import LoginPage from "../pages/auth/LoginPage.jsx";
 import RegisterBusinessPage from "../pages/auth/RegisterBusinessPage.jsx";
 import DashboardPage from "../pages/dashboard/DashboardPage.jsx";
 import UsersPage from "../pages/usuarios/UsersPage.jsx";
+import ProductsPage from "../pages/productos/ProductsPage.jsx";
+import InventoryPage from "../pages/inventario/InventoryPage.jsx";
 
 function RutaPorDefecto() {
 	const { estaAutenticado } = useAuth();
@@ -22,6 +24,14 @@ export default function AppRoutes() {
 			<Route element={<ProtectedRoute />}>
 				<Route element={<DashboardLayout />}>
 					<Route path="/dashboard" element={<DashboardPage />} />
+					<Route path="/productos" element={<ProductsPage />} />
+				</Route>
+			</Route>
+
+			{/* Autenticadas: ADMIN y VENDEDOR */}
+			<Route element={<ProtectedRoute rolesPermitidos={["ADMIN", "VENDEDOR"]} />}>
+				<Route element={<DashboardLayout />}>
+					<Route path="/inventario" element={<InventoryPage />} />
 				</Route>
 			</Route>
 

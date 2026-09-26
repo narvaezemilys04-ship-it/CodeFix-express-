@@ -35,3 +35,22 @@ a:hover {
 	font-size: var(--font-size-xs);
 	color: var(--color-text-muted);
 }
+
+/* Campo de formulario genérico: lo usan Input y Select por igual, por eso
+   vive acá y no en el CSS de un componente específico. */
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+}
+
+.form-field label {
+	font-size: var(--font-size-sm);
+	color: var(--color-text-secondary);
+}
+
+.form-field-error {
+	color: var(--color-danger);
+	font-size: var(--font-size-sm);
+	margin: 0;
+}

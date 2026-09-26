@@ -1,0 +1,25 @@
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--spacing-md);
+	z-index: var(--z-modal-backdrop);
+}
+
+.modal-content {
+	background: var(--color-white);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-lg);
+	padding: var(--spacing-xl);
+	width: 100%;
+	max-width: 480px;
+	max-height: 90vh;
+	overflow-y: auto;
+	z-index: var(--z-modal);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
+}

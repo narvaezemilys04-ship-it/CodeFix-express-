@@ -48,3 +48,4 @@ import ClientsPage from "../pages/clientes/ClientsPage";
     </ProtectedRoute>
   }
 />
+import NewInvoicesPage from "../pages/facturas/NewInvoicesPage";

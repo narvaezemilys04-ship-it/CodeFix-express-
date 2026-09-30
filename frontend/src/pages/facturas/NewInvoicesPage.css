@@ -1,0 +1,62 @@
+.new-invoice-page {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.invoice-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.invoice-product-row {
+	display: grid;
+	grid-template-columns: 2fr 120px auto;
+	gap: 1rem;
+	align-items: end;
+}
+
+.invoice-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.invoice-table th,
+.invoice-table td {
+	padding: 0.75rem;
+	border-bottom: 1px solid #e5e7eb;
+	text-align: left;
+}
+
+.invoice-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.invoice-summary > div {
+	display: flex;
+	justify-content: space-between;
+}
+
+.invoice-total {
+	font-size: 1.1rem;
+	font-weight: 700;
+	padding-top: 0.5rem;
+	border-top: 1px solid #e5e7eb;
+}
+
+.invoice-success {
+	margin-top: 1rem;
+	padding: 1rem;
+	border-radius: 8px;
+	background: #ecfdf5;
+}

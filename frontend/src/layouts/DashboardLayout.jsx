@@ -47,3 +47,12 @@ export default function DashboardLayout() {
 		</div>
 	);
 }
+
+{["ADMIN", "VENDEDOR"].includes(usuario?.rol) && (
+	<NavLink
+		to="/facturas/nueva"
+		className={itemClase}
+	>
+		<span>Nueva factura</span>
+	</NavLink>
+)}

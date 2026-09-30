@@ -16,9 +16,16 @@ export default function DashboardLayout() {
 				<NavLink to="/dashboard" className={itemClase}>
 					<span>Inicio</span>
 				</NavLink>
+
 				{usuario?.rol === "ADMIN" && (
 					<NavLink to="/usuarios" className={itemClase}>
 						<span>Usuarios</span>
+					</NavLink>
+				)}
+
+				{["ADMIN", "VENDEDOR"].includes(usuario?.rol) && (
+					<NavLink to="/clientes" className={itemClase}>
+						<span>Clientes</span>
 					</NavLink>
 				)}
 			</aside>

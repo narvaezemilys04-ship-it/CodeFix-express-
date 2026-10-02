@@ -19,3 +19,11 @@ export async function crearFactura(datos) {
 
   return data;
 }
+export const anularFactura = async (id, motivo) => {
+	const response = await api.post(
+		`/facturas/${id}/anular`,
+		{ motivo }
+	);
+
+	return response.data;
+};

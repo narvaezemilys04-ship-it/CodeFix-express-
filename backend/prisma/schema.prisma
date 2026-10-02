@@ -25,7 +25,10 @@ model Negocio {
   tarifaIvaDefault Decimal  @default(19.00) @db.Decimal(5, 2)
   creadoEn         DateTime @default(now())
 
-  usuarios Usuario[]
+  usuarios    Usuario[]
+  categorias  CategoriaProducto[]
+  productos   Producto[]
+  movimientos MovimientoInventario[]
 }
 
 model Usuario {
@@ -59,15 +62,19 @@ enum TipoMovimiento {
 
 model CategoriaProducto {
   id          Int        @id @default(autoincrement())
+  tenantId    Int
   nombre      String     @db.VarChar(100)
   descripcion String?    @db.VarChar(255)
   activa      Boolean    @default(true)
 
+  negocio     Negocio    @relation(fields: [tenantId], references: [id])
   productos   Producto[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
+  @@unique([tenantId, nombre])
+  @@index([tenantId])
   @@map("categorias_productos")
 }
 
@@ -77,9 +84,10 @@ model CategoriaProducto {
 
 model Producto {
   id              Int                  @id @default(autoincrement())
+  tenantId        Int
   nombre          String               @db.VarChar(150)
   descripcion     String?              @db.Text
-  codigo          String               @unique @db.VarChar(50)
+  codigo          String               @db.VarChar(50)
   precio          Decimal              @db.Decimal(10, 2)
   stock           Int                  @default(0)
   stockMinimo     Int                  @default(5)
@@ -87,12 +95,15 @@ model Producto {
 
   categoriaId     Int
   categoria       CategoriaProducto    @relation(fields: [categoriaId], references: [id])
+  negocio         Negocio              @relation(fields: [tenantId], references: [id])
 
   movimientos     MovimientoInventario[]
 
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
   @@index([categoriaId])
   @@map("productos")
 }
@@ -103,9 +114,11 @@ model Producto {
 
 model MovimientoInventario {
   id              Int              @id @default(autoincrement())
+  tenantId        Int
 
   productoId      Int
   producto        Producto         @relation(fields: [productoId], references: [id])
+  negocio         Negocio          @relation(fields: [tenantId], references: [id])
 
   tipo            TipoMovimiento
 
@@ -121,6 +134,7 @@ model MovimientoInventario {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
+  @@index([tenantId])
   @@index([productoId])
   @@index([fechaMovimiento])
   @@map("movimientos_inventario")

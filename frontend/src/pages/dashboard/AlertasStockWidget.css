@@ -1,0 +1,11 @@
+.card ul {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-sm);
+}
+
+.card li {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+}

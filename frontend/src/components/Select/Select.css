@@ -1,15 +1,16 @@
-.input {
+.select {
 	padding: var(--spacing-sm) 0.75rem;
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-sm);
 	font-size: var(--font-size-base);
+	background-color: var(--color-white);
 }
 
-.input:focus {
+.select:focus {
 	outline: 2px solid var(--color-primary-light);
 	outline-offset: 1px;
 }
 
-.input-error {
+.select-error {
 	border-color: var(--color-danger);
 }

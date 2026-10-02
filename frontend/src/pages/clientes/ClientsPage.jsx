@@ -18,6 +18,9 @@ const estadoInicial = {
 };
 
 const ClientsPage = () => {
+  const [busqueda, setBusqueda] = useState("");
+
+
   const { clientes, loading, crear, actualizar } = useClients();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,6 +40,16 @@ const ClientsPage = () => {
       setFormulario(estadoInicial);
     }
   }, [clienteActual]);
+
+  useEffect(() => {
+  const timeout = setTimeout(() => {
+    recargar({
+      nombre: busqueda,
+    });
+  }, 400);
+
+  return () => clearTimeout(timeout);
+}, [busqueda, recargar]);
 
   const abrirCrear = () => {
     setClienteActual(null);
@@ -120,6 +133,16 @@ const ClientsPage = () => {
           + Nuevo cliente
         </Button>
       </div>
+<div className="clients-search">
+  <Input
+    placeholder="Buscar cliente..."
+    value={busqueda}
+    onChange={(e) =>
+      setBusqueda(e.target.value)
+    }
+  />
+</div>
+
 
       <Card>
         <Table

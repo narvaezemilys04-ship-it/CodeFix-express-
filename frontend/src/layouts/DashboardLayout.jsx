@@ -7,6 +7,8 @@ function itemClase({ isActive }) {
 	return `app-sidebar-item${isActive ? " is-active" : ""}`;
 }
 
+
+
 export default function DashboardLayout() {
 	const { usuario, logout } = useAuth();
 
@@ -48,7 +50,7 @@ export default function DashboardLayout() {
 	);
 }
 
-{["ADMIN", "VENDEDOR"].includes(usuario?.rol) && (
+{["ADMIN", "VENDEDOR", "CONTADOR"].includes(usuario?.rol) && (
 	<NavLink
 		to="/facturas/nueva"
 		className={itemClase}

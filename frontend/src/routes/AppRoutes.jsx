@@ -6,6 +6,7 @@ import LoginPage from "../pages/auth/LoginPage.jsx";
 import RegisterBusinessPage from "../pages/auth/RegisterBusinessPage.jsx";
 import DashboardPage from "../pages/dashboard/DashboardPage.jsx";
 import UsersPage from "../pages/usuarios/UsersPage.jsx";
+import InvoicesPage from "../pages/facturas/InvoicesPage";
 
 function RutaPorDefecto() {
 	const { estaAutenticado } = useAuth();
@@ -31,6 +32,21 @@ export default function AppRoutes() {
 					<Route path="/usuarios" element={<UsersPage />} />
 				</Route>
 			</Route>
+
+			<Route
+  path="/facturas"
+  element={
+    <ProtectedRoute
+      roles={[
+        "ADMIN",
+        "VENDEDOR",
+        "CONTADOR",
+      ]}
+    >
+      <InvoicesPage />
+    </ProtectedRoute>
+  }
+/>
 
 			<Route path="*" element={<RutaPorDefecto />} />
 		</Routes>

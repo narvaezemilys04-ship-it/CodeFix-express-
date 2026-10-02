@@ -1,0 +1,46 @@
+.invoices-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filters-card {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.invoice-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.invoice-info {
+  display: grid;
+  gap: 8px;
+}
+
+.invoice-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.error-message {
+  padding: 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+}

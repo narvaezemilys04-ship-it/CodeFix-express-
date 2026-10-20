@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { ConflictError } from "../utils/errors.js";
+import { pick } from "../utils/pick.js";
 
 // Todo método recibe tenantId como primer parámetro y lo aplica en la
 // consulta (DDS 5.3) — mismo patrón que negocios.service.js/usuarios.service.js
@@ -8,7 +9,7 @@ import { ConflictError } from "../utils/errors.js";
 export async function crearCategoria(tenantId, datos) {
 	try {
 		return await prisma.categoriaProducto.create({
-			data: { tenantId, ...datos },
+			data: { ...pick(datos, ["nombre", "descripcion"]), tenantId },
 		});
 	} catch (error) {
 		if (error.code === "P2002") {

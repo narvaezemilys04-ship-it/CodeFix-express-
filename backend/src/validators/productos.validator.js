@@ -20,10 +20,13 @@ export function validarCrearProducto(body) {
 
 export function validarActualizarProducto(body) {
 	const errores = [];
-	const { precio } = body ?? {};
+	const { precio, categoriaId } = body ?? {};
 
 	if (precio !== undefined && (typeof precio !== "number" || precio < 0)) {
 		errores.push("El precio debe ser un número mayor o igual a 0.");
+	}
+	if (categoriaId !== undefined && typeof categoriaId !== "number") {
+		errores.push("La categoría del producto debe ser un número.");
 	}
 
 	return errores;
